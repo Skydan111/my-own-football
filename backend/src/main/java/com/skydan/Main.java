@@ -23,6 +23,7 @@ public class Main {
             AppUser nick = new AppUser("Nick Skydan", "nickskidan@gmail.com", 36);
 
             List<AppUser> users = List.of(oleg, nick);
+
             appUserRepository.saveAll(users);
         };
     }
