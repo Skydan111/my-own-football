@@ -1,0 +1,35 @@
+services:
+  db:
+    container_name: postgresql
+    image: postgres
+    environment:
+      POSTGRES_USER: skydan
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+  my-own-football:
+    container_name: my-own-football
+    image: skydan111/my-own-football
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/app_user
+    ports:
+      - "8088:8080"
+    networks:
+      - postgres
+    depends_on:
+      - db
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
+
