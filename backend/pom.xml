@@ -15,8 +15,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>my-own-football</name>
 	<description>Demo project for Spring Boot</description>
+
 	<properties>
 		<java.version>19</java.version>
+		<docker.username>skydan111</docker.username>
+		<docker.image.name>my-own-football</docker.image.name>
+		<docker.image.tag/>
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -131,7 +136,7 @@
 						</platforms>
 					</from>
 					<to>
-						<image>docker.io/skydan111/my-own-football</image>
+						<image>docker.io/${docker.username}}/${docker.image.name}:${docker.image.tag}</image>
 					</to>
 				</configuration>
 			</plugin>
