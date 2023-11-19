@@ -52,7 +52,7 @@ class AppUserDataAccessServiceTest {
     @Test
     void insertAppUser() {
         //Given
-        AppUser appUser = new AppUser(1, "Foo", "foo@email.com", 18);
+        AppUser appUser = new AppUser(1, "Foo", "foo@email.com", 18, Team.SHAKHTAR);
 
         //When
         underTest.insertAppUser(appUser);
@@ -100,7 +100,7 @@ class AppUserDataAccessServiceTest {
     @Test
     void updateAppUser() {
         //Given
-        AppUser appUser = new AppUser(1, "Foo", "foo@email.com", 18);
+        AppUser appUser = new AppUser(1, "Foo", "foo@email.com", 18, Team.SHAKHTAR);
 
         //When
         underTest.updateAppUser(appUser);

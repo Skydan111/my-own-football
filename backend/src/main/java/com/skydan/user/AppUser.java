@@ -38,21 +38,28 @@ public class AppUser {
                 nullable = false
         )
         private Integer age;
+        @Column(
+                nullable = false
+        )
+        @Enumerated(EnumType.STRING)
+        private Team team;
 
         public AppUser() {
         }
 
-        public AppUser(Integer id, String name, String email, Integer age) {
+        public AppUser(Integer id, String name, String email, Integer age, Team team) {
             this.id = id;
             this.name = name;
             this.email = email;
             this.age = age;
+            this.team = team;
         }
 
-    public AppUser(String name, String email, Integer age) {
+    public AppUser(String name, String email, Integer age, Team team) {
         this.name = name;
         this.email = email;
         this.age = age;
+        this.team = team;
     }
 
     public Integer getId() {
@@ -87,26 +94,35 @@ public class AppUser {
             this.age = age;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            AppUser appUser = (AppUser) o;
-            return Objects.equals(id, appUser.id) && Objects.equals(name, appUser.name) && Objects.equals(email, appUser.email) && Objects.equals(age, appUser.age);
-        }
+    public Team getTeam() {
+        return team;
+    }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, name, email, age);
-        }
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 
-        @Override
-        public String toString() {
-            return "AppUser{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    ", email='" + email + '\'' +
-                    ", age=" + age +
-                    '}';
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AppUser appUser = (AppUser) o;
+        return Objects.equals(id, appUser.id) && Objects.equals(name, appUser.name) && Objects.equals(email, appUser.email) && Objects.equals(age, appUser.age) && team == appUser.team;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email, age, team);
+    }
+
+    @Override
+    public String toString() {
+        return "AppUser{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", age=" + age +
+                ", team=" + team +
+                '}';
+    }
 }

@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.skydan.user.Team.DYNAMO;
+import static com.skydan.user.Team.SHAKHTAR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -41,7 +43,7 @@ class AppUserServiceTest {
     void canGetAppUsersById() {
         //Given
         int id = 1;
-        AppUser appUser = new AppUser(id,"Foo", "foo@email.com", 18);
+        AppUser appUser = new AppUser(id,"Foo", "foo@email.com", 18, SHAKHTAR);
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         //When
@@ -70,7 +72,7 @@ class AppUserServiceTest {
         String email = "foo@email.com";
         when(appUserDao.existsUserWithEmail(email)).thenReturn(false);
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                "Foo", email, 18
+                "Foo", email, 18, SHAKHTAR
         );
 
         //When
@@ -93,7 +95,7 @@ class AppUserServiceTest {
         String email = "foo@email.com";
         when(appUserDao.existsUserWithEmail(email)).thenReturn(true);
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                "Foo", email, 18
+                "Foo", email, 18, SHAKHTAR
         );
 
         //When
@@ -138,14 +140,14 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@gmail.com", 19
+                id, "Foo", "foo@gmail.com", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         String newEmail = "bar@email.com";
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                "Bar", newEmail, 23);
+                "Bar", newEmail, 23, DYNAMO);
 
         when(appUserDao.existsUserWithEmail(newEmail)).thenReturn(false);
 
@@ -162,19 +164,20 @@ class AppUserServiceTest {
         assertThat(capturedAppUser.getName()).isEqualTo(updateRequest.name());
         assertThat(capturedAppUser.getEmail()).isEqualTo(updateRequest.email());
         assertThat(capturedAppUser.getAge()).isEqualTo(updateRequest.age());
+        assertThat(capturedAppUser.getTeam()).isEqualTo(updateRequest.team());
     }
 
     @Test
-    void canUpdateOnlyCustomerName() {
+    void canUpdateOnlyAppUserName() {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19
+                id, "Foo", "foo@email.com", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                "Bar", null, null);
+                "Bar", null, null, null);
 
         // When
         underTest.updateAppUser(id, updateRequest);
@@ -189,21 +192,22 @@ class AppUserServiceTest {
         assertThat(capturedAppUser.getName()).isEqualTo(updateRequest.name());
         assertThat(capturedAppUser.getAge()).isEqualTo(appUser.getAge());
         assertThat(capturedAppUser.getEmail()).isEqualTo(appUser.getEmail());
+        assertThat(capturedAppUser.getTeam()).isEqualTo(appUser.getTeam());
     }
 
     @Test
-    void canUpdateOnlyCustomerEmail() {
+    void canUpdateOnlyAppUserEmail() {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19
+                id, "Foo", "foo@email.com", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         String newEmail = "bar@email.com";
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                null, newEmail, null);
+                null, newEmail, null, null);
 
         when(appUserDao.existsUserWithEmail(newEmail)).thenReturn(false);
 
@@ -220,19 +224,20 @@ class AppUserServiceTest {
         assertThat(capturedAppUser.getName()).isEqualTo(appUser.getName());
         assertThat(capturedAppUser.getAge()).isEqualTo(appUser.getAge());
         assertThat(capturedAppUser.getEmail()).isEqualTo(newEmail);
+        assertThat(capturedAppUser.getTeam()).isEqualTo(appUser.getTeam());
     }
 
     @Test
-    void canUpdateOnlyCustomerAge() {
+    void canUpdateOnlyAppUserAge() {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19
+                id, "Foo", "foo@email.com", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                null, null, 22);
+                null, null, 22, null);
 
         // When
         underTest.updateAppUser(id, updateRequest);
@@ -247,6 +252,35 @@ class AppUserServiceTest {
         assertThat(capturedAppUser.getName()).isEqualTo(appUser.getName());
         assertThat(capturedAppUser.getAge()).isEqualTo(updateRequest.age());
         assertThat(capturedAppUser.getEmail()).isEqualTo(appUser.getEmail());
+        assertThat(capturedAppUser.getTeam()).isEqualTo(appUser.getTeam());
+    }
+
+    @Test
+    void canUpdateOnlyAppUserTeam() {
+        // Given
+        int id = 1;
+        AppUser appUser = new AppUser(
+                id, "Foo", "foo@email.com", 19, SHAKHTAR
+        );
+        when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
+
+        AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
+                null, null, null, DYNAMO);
+
+        // When
+        underTest.updateAppUser(id, updateRequest);
+
+        // Then
+        ArgumentCaptor<AppUser> appUserArgumentCaptor =
+                ArgumentCaptor.forClass(AppUser.class);
+
+        verify(appUserDao).updateAppUser(appUserArgumentCaptor.capture());
+        AppUser capturedAppUser = appUserArgumentCaptor.getValue();
+
+        assertThat(capturedAppUser.getName()).isEqualTo(appUser.getName());
+        assertThat(capturedAppUser.getAge()).isEqualTo(appUser.getAge());
+        assertThat(capturedAppUser.getEmail()).isEqualTo(appUser.getEmail());
+        assertThat(capturedAppUser.getTeam()).isEqualTo(updateRequest.team());
     }
 
     @Test
@@ -254,14 +288,14 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19
+                id, "Foo", "foo@email.com", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         String newEmail = "bar@email.com";
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                null, newEmail, null);
+                null, newEmail, null, null);
 
         when(appUserDao.existsUserWithEmail(newEmail)).thenReturn(true);
 
@@ -279,12 +313,12 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19
+                id, "Foo", "foo@email.com", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                appUser.getName(), appUser.getEmail(), appUser.getAge());
+                appUser.getName(), appUser.getEmail(), appUser.getAge(), appUser.getTeam());
 
         // When
         assertThatThrownBy(() -> underTest.updateAppUser(id, updateRequest))

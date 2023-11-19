@@ -3,6 +3,7 @@ package com.skydan.journey;
 import com.skydan.user.AppUser;
 import com.skydan.user.AppUserRegistrationRequest;
 import com.skydan.user.AppUserUpdateRequest;
+import com.skydan.user.Team;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +31,7 @@ public class AppUserIntegrationTest {
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, 18
+                name, email, 18, Team.SHAKHTAR
         );
 
         webTestClient.post()
@@ -53,7 +54,7 @@ public class AppUserIntegrationTest {
                 .returnResult()
                 .getResponseBody();
 
-        AppUser expected = new AppUser(name, email, 18);
+        AppUser expected = new AppUser(name, email, 18, Team.SHAKHTAR);
 
         assertThat(appUsers)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
@@ -84,7 +85,7 @@ public class AppUserIntegrationTest {
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, 18
+                name, email, 18, Team.SHAKHTAR
         );
 
         webTestClient.post()
@@ -133,7 +134,7 @@ public class AppUserIntegrationTest {
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, 18
+                name, email, 18, Team.SHAKHTAR
         );
 
         webTestClient.post()
@@ -163,7 +164,7 @@ public class AppUserIntegrationTest {
 
         String newName = "Bar";
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                newName, null, null
+                newName, null, null, null
         );
 
         webTestClient.put()
@@ -186,7 +187,7 @@ public class AppUserIntegrationTest {
                 .getResponseBody();
 
         AppUser expected = new AppUser(
-                id, newName, email, 18
+                id, newName, email, 18, Team.SHAKHTAR
         );
 
         assertThat(updatedAppUser).isEqualTo(expected);

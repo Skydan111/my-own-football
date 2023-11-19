@@ -33,7 +33,8 @@ public class AppUserService {
         AppUser appUser = new AppUser(
                 appUserRegistrationRequest.name(),
                 appUserRegistrationRequest.email(),
-                appUserRegistrationRequest.age()
+                appUserRegistrationRequest.age(),
+                appUserRegistrationRequest.team()
         );
         appUserDao.insertAppUser(appUser);
     }
@@ -63,6 +64,10 @@ public class AppUserService {
         }
         if (request.age() != null && !request.age().equals(appUser.getAge())) {
             appUser.setAge(request.age());
+            changes = true;
+        }
+        if (request.team() != null && !request.team().equals(appUser.getTeam())) {
+            appUser.setTeam(request.team());
             changes = true;
         }
         if (!changes) throw new RequestValidationException("no data changes found");
