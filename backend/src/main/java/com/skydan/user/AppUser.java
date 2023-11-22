@@ -16,44 +16,44 @@ import java.util.Objects;
 )
 public class AppUser {
 
-        @Id
-        @SequenceGenerator(
-                name = "app_user_id_sequence",
-                sequenceName = "app_user_id_sequence"
-        )
-        @GeneratedValue(
-                strategy = GenerationType.SEQUENCE,
-                generator = "app_user_id_sequence"
-        )
-        private Integer id;
-        @Column(
-                nullable = false
-        )
-        private String name;
-        @Column(
-                nullable = false
-        )
-        private String email;
-        @Column(
-                nullable = false
-        )
-        private Integer age;
-        @Column(
-                nullable = false
-        )
-        @Enumerated(EnumType.STRING)
-        private Team team;
+    @Id
+    @SequenceGenerator(
+            name = "app_user_id_sequence",
+            sequenceName = "app_user_id_sequence"
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "app_user_id_sequence"
+    )
+    private Integer id;
+    @Column(
+            nullable = false
+    )
+    private String name;
+    @Column(
+            nullable = false
+    )
+    private String email;
+    @Column(
+            nullable = false
+    )
+    private Integer age;
+    @Column(
+            nullable = false
+    )
+    @Enumerated(EnumType.STRING)
+    private Team team;
 
-        public AppUser() {
-        }
+    public AppUser() {
+    }
 
-        public AppUser(Integer id, String name, String email, Integer age, Team team) {
-            this.id = id;
-            this.name = name;
-            this.email = email;
-            this.age = age;
-            this.team = team;
-        }
+    public AppUser(Integer id, String name, String email, Integer age, Team team) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.age = age;
+        this.team = team;
+    }
 
     public AppUser(String name, String email, Integer age, Team team) {
         this.name = name;
@@ -63,36 +63,36 @@ public class AppUser {
     }
 
     public Integer getId() {
-            return id;
-        }
+        return id;
+    }
 
-        public void setId(Integer id) {
-            this.id = id;
-        }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-        public String getName() {
-            return name;
-        }
+    public String getName() {
+        return name;
+    }
 
-        public void setName(String name) {
-            this.name = name;
-        }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        public String getEmail() {
-            return email;
-        }
+    public String getEmail() {
+        return email;
+    }
 
-        public void setEmail(String email) {
-            this.email = email;
-        }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-        public Integer getAge() {
-            return age;
-        }
+    public Integer getAge() {
+        return age;
+    }
 
-        public void setAge(Integer age) {
-            this.age = age;
-        }
+    public void setAge(Integer age) {
+        this.age = age;
+    }
 
     public Team getTeam() {
         return team;
@@ -107,7 +107,10 @@ public class AppUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AppUser appUser = (AppUser) o;
-        return Objects.equals(id, appUser.id) && Objects.equals(name, appUser.name) && Objects.equals(email, appUser.email) && Objects.equals(age, appUser.age) && team == appUser.team;
+        return Objects.equals(id, appUser.id) &&
+                Objects.equals(name, appUser.name) &&
+                Objects.equals(email, appUser.email) &&
+                Objects.equals(age, appUser.age) && team == appUser.team;
     }
 
     @Override

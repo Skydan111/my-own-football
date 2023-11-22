@@ -8,21 +8,31 @@ import SidebarWithHeader from "./components/shared/SideBar.jsx";
 import {useEffect, useState} from "react";
 import {getAppUsers} from "./services/client.js";
 import CardWithImage from "./components/CardWithImage.jsx";
+import {errorNotification} from "./services/notification.js";
 
 function App() {
 
     const [appUsers, setAppUsers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [err, setError] = useState("");
 
-    useEffect(() => {
+    const fetchAppUsers = () => {
         setLoading(true);
         getAppUsers().then(res => {
             setAppUsers(res.data);
         }).catch(err => {
-            console.log(err);
+            setError(err.response.data.message)
+            errorNotification(
+                "What are you doing?",
+                err.response.data.message
+            )
         }).finally(() => {
             setLoading(false);
         })
+    }
+
+    useEffect(() => {
+        fetchAppUsers();
     }, []);
 
     if (loading) {
@@ -35,6 +45,14 @@ function App() {
                     color='blue.500'
                     size='xl'
                 />
+            </SidebarWithHeader>
+        )
+    }
+
+    if (err) {
+        return (
+            <SidebarWithHeader>
+                <Text>Oops there was an error</Text>
             </SidebarWithHeader>
         )
     }
@@ -54,6 +72,7 @@ function App() {
                     <WrapItem key={index}>
                         <CardWithImage
                             {...appUser}
+                            fetchAppUsers={fetchAppUsers}
                         />
                     </WrapItem>
                 ))}
