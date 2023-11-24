@@ -76,8 +76,8 @@ export default function CardWithImage({id, name, email, age, fetchAppUsers}) {
                 <Stack direction={'row'} justify={'center'} spacing={6} p={4}>
                     <Stack>
                         <UpdateAppUserDrawer
-                            initialValues={{ name, email, age }}
-                            appUserId={ id }
+                            initialValues={{name, email, age}}
+                            appUserId={id}
                             fetchAppUsers={fetchAppUsers}
                         />
                     </Stack>

@@ -25,6 +25,18 @@ services:
     depends_on:
       - db
     restart: unless-stopped
+  my-own-football-react:
+    container_name: my-own-football-react
+    image: skydan111/my-own-football-react
+    build:
+      context: frontend/my-own-football-react
+      args:
+        api_base_url: http://localhost:8088
+    ports:
+      - "3000:5173"
+    depends_on:
+      - my-own-football
+    restart: unless-stopped
 
 networks:
   postgres:
