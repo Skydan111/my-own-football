@@ -1,9 +1,6 @@
 package com.skydan.journey;
 
-import com.skydan.user.AppUser;
-import com.skydan.user.AppUserRegistrationRequest;
-import com.skydan.user.AppUserUpdateRequest;
-import com.skydan.user.Team;
+import com.skydan.user.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,10 +13,11 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.*;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-public class AppUserIntegrationTest {
+public class AppUserIT {
 
     @Autowired
     private WebTestClient webTestClient;
@@ -31,50 +29,53 @@ public class AppUserIntegrationTest {
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, 18, Team.SHAKHTAR
-        );
+                name, email, "password", 18,
+                Team.SHAKHTAR);
 
-        webTestClient.post()
+        String jwtToken = webTestClient.post()
                 .uri(USER_PATH)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .body(Mono.just(request), AppUserRegistrationRequest.class)
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .get(AUTHORIZATION)
+                .get(0);
 
-        List<AppUser> appUsers = webTestClient.get()
+        List<AppUserDTO> appUsers = webTestClient.get()
                 .uri(USER_PATH)
                 .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(new ParameterizedTypeReference<AppUser>() {
+                .expectBodyList(new ParameterizedTypeReference<AppUserDTO>() {
                 })
                 .returnResult()
                 .getResponseBody();
 
-        AppUser expected = new AppUser(name, email, 18, Team.SHAKHTAR);
-
-        assertThat(appUsers)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                .contains(expected);
-
         int id = appUsers.stream()
-                .filter(appUser -> appUser.getEmail().equals(email))
-                .map(AppUser::getId)
+                .filter(appUser -> appUser.email().equals(email))
+                .map(AppUserDTO::id)
                 .findFirst()
                 .orElseThrow();
 
-        expected.setId(id);
+        AppUserDTO expected =
+                new AppUserDTO(id, name, email, 18, Team.SHAKHTAR, List.of("ROLE_USER"), email);
+
+        assertThat(appUsers).contains(expected);
 
         webTestClient.get()
                 .uri(USER_PATH + "/{id}", id)
                 .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(new ParameterizedTypeReference<AppUser>() {
+                .expectBody(new ParameterizedTypeReference<AppUserDTO>() {
                 })
                 .isEqualTo(expected);
     }
@@ -84,10 +85,14 @@ public class AppUserIntegrationTest {
 
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
-        AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, 18, Team.SHAKHTAR
-        );
 
+        AppUserRegistrationRequest request = new AppUserRegistrationRequest(
+                name, email, "password", 18, Team.SHAKHTAR);
+
+        AppUserRegistrationRequest request2 = new AppUserRegistrationRequest(
+                name, email + ".ua", "password", 18, Team.SHAKHTAR);
+
+        // Send post request to create user 1
         webTestClient.post()
                 .uri(USER_PATH)
                 .accept(APPLICATION_JSON)
@@ -97,31 +102,52 @@ public class AppUserIntegrationTest {
                 .expectStatus()
                 .isOk();
 
-        List<AppUser> appUsers = webTestClient.get()
+        // Send post request to create user 2
+        String jwtToken = webTestClient.post()
                 .uri(USER_PATH)
                 .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .body(Mono.just(request2), AppUserRegistrationRequest.class)
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(new ParameterizedTypeReference<AppUser>() {})
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .get(AUTHORIZATION)
+                .get(0);
+
+        // get all users
+        List<AppUserDTO> appUsers = webTestClient.get()
+                .uri(USER_PATH)
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<AppUserDTO>() {
+                })
                 .returnResult()
                 .getResponseBody();
 
         int id = appUsers.stream()
-                .filter(appUser -> appUser.getEmail().equals(email))
-                .map(AppUser::getId)
+                .filter(appUser -> appUser.email().equals(email))
+                .map(AppUserDTO::id)
                 .findFirst()
                 .orElseThrow();
 
+        // user 2 deletes user 1
         webTestClient.delete()
                 .uri(USER_PATH + "/{id}", id)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
                 .isOk();
 
+        // user 2 get user 1 by id
         webTestClient.get()
                 .uri(USER_PATH + "/{id}", id)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -134,31 +160,37 @@ public class AppUserIntegrationTest {
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, 18, Team.SHAKHTAR
-        );
+                name, email, "password", 18,
+                Team.SHAKHTAR);
 
-        webTestClient.post()
+        String jwtToken = webTestClient.post()
                 .uri(USER_PATH)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .body(Mono.just(request), AppUserRegistrationRequest.class)
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .get(AUTHORIZATION)
+                .get(0);
 
-        List<AppUser> appUsers = webTestClient.get()
+        List<AppUserDTO> appUsers = webTestClient.get()
                 .uri(USER_PATH)
                 .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(new ParameterizedTypeReference<AppUser>() {})
+                .expectBodyList(new ParameterizedTypeReference<AppUserDTO>() {
+                })
                 .returnResult()
                 .getResponseBody();
 
         int id = appUsers.stream()
-                .filter(appUser -> appUser.getEmail().equals(email))
-                .map(AppUser::getId)
+                .filter(appUser -> appUser.email().equals(email))
+                .map(AppUserDTO::id)
                 .findFirst()
                 .orElseThrow();
 
@@ -170,24 +202,26 @@ public class AppUserIntegrationTest {
         webTestClient.put()
                 .uri(USER_PATH + "/{id}", id)
                 .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .contentType(APPLICATION_JSON)
                 .body(Mono.just(updateRequest), AppUserUpdateRequest.class)
                 .exchange()
                 .expectStatus()
                 .isOk();
 
-        AppUser updatedAppUser = webTestClient.get()
+        AppUserDTO updatedAppUser = webTestClient.get()
                 .uri(USER_PATH + "/{id}", id)
                 .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(AppUser.class)
+                .expectBody(AppUserDTO.class)
                 .returnResult()
                 .getResponseBody();
 
-        AppUser expected = new AppUser(
-                id, newName, email, 18, Team.SHAKHTAR
+        AppUserDTO expected = new AppUserDTO(
+                id, newName, email, 18, Team.SHAKHTAR, List.of("ROLE_USER"), email
         );
 
         assertThat(updatedAppUser).isEqualTo(expected);

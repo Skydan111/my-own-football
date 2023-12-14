@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -23,11 +24,14 @@ class AppUserServiceTest {
 
     @Mock
     private AppUserDao appUserDao;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     private AppUserService underTest;
+    private final AppUserDTOMapper appUserDTOMapper = new AppUserDTOMapper();
 
     @BeforeEach
     void setUp() {
-        underTest = new AppUserService(appUserDao);
+        underTest = new AppUserService(appUserDao, appUserDTOMapper, passwordEncoder);
     }
 
     @Test
@@ -43,14 +47,16 @@ class AppUserServiceTest {
     void canGetAppUsersById() {
         //Given
         int id = 1;
-        AppUser appUser = new AppUser(id,"Foo", "foo@email.com", 18, SHAKHTAR);
+        AppUser appUser = new AppUser(id,"Foo", "foo@email.com", "password", 18, SHAKHTAR);
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
+        AppUserDTO expected = appUserDTOMapper.apply(appUser);
+
         //When
-        AppUser actual = underTest.getAppUsersById(id);
+        AppUserDTO actual = underTest.getAppUsersById(id);
 
         //Then
-        assertThat(actual).isEqualTo(appUser);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -72,8 +78,11 @@ class AppUserServiceTest {
         String email = "foo@email.com";
         when(appUserDao.existsUserWithEmail(email)).thenReturn(false);
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                "Foo", email, 18, SHAKHTAR
-        );
+                "Foo", email, "password", 18, SHAKHTAR);
+
+        String passwordHash = "$%^%^UGvsdjnvGFNJM%^&R$";
+
+        when(passwordEncoder.encode(request.password())).thenReturn(passwordHash);
 
         //When
         underTest.addAppUser(request);
@@ -87,6 +96,7 @@ class AppUserServiceTest {
         assertThat(capturedAppUser.getName()).isEqualTo(request.name());
         assertThat(capturedAppUser.getEmail()).isEqualTo(request.email());
         assertThat(capturedAppUser.getAge()).isEqualTo(request.age());
+        assertThat(capturedAppUser.getPassword()).isEqualTo(passwordHash);
     }
 
     @Test
@@ -95,8 +105,8 @@ class AppUserServiceTest {
         String email = "foo@email.com";
         when(appUserDao.existsUserWithEmail(email)).thenReturn(true);
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                "Foo", email, 18, SHAKHTAR
-        );
+                "Foo", email, "password", 18,
+                SHAKHTAR);
 
         //When
         assertThatThrownBy(() -> underTest.addAppUser(request))
@@ -140,7 +150,7 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@gmail.com", 19, SHAKHTAR
+                id, "Foo", "foo@gmail.com", "password", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
@@ -172,7 +182,7 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
@@ -200,7 +210,7 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
@@ -232,7 +242,7 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
@@ -260,7 +270,7 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
@@ -288,7 +298,7 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
@@ -313,7 +323,7 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 

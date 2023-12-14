@@ -11,4 +11,5 @@ public interface AppUserDao {
     boolean existsUserWithId(Integer appUserId);
     void deleteAppUserById(Integer appUserId);
     void updateAppUser(AppUser update);
+    Optional<AppUser> selectAppUserByEmail(String email);
 }

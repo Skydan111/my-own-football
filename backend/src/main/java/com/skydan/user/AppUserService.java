@@ -3,25 +3,36 @@ package com.skydan.user;
 import com.skydan.exception.DuplicateResourceException;
 import com.skydan.exception.RequestValidationException;
 import com.skydan.exception.ResourceNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AppUserService {
 
     private final AppUserDao appUserDao;
+    private final AppUserDTOMapper appUserDTOMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public AppUserService(AppUserDao appUserDao) {
+
+    public AppUserService(AppUserDao appUserDao, AppUserDTOMapper appUserDTOMapper, PasswordEncoder passwordEncoder) {
         this.appUserDao = appUserDao;
+        this.appUserDTOMapper = appUserDTOMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public List<AppUser> getAllAppUsers() {
-        return appUserDao.selectAllAppUsers();
+    public List<AppUserDTO> getAllAppUsers() {
+        return appUserDao.selectAllAppUsers()
+                .stream()
+                .map(appUserDTOMapper)
+                .collect(Collectors.toList());
     }
 
-    public AppUser getAppUsersById(Integer appUserId) {
+    public AppUserDTO getAppUsersById(Integer appUserId) {
         return appUserDao.selectAppUsersById(appUserId)
+                .map(appUserDTOMapper)
                 .orElseThrow(() -> new ResourceNotFoundException("appUser with id [%s] not found".formatted(appUserId)));
     }
 
@@ -33,6 +44,7 @@ public class AppUserService {
         AppUser appUser = new AppUser(
                 appUserRegistrationRequest.name(),
                 appUserRegistrationRequest.email(),
+                passwordEncoder.encode(appUserRegistrationRequest.password()),
                 appUserRegistrationRequest.age(),
                 appUserRegistrationRequest.team()
         );
@@ -47,7 +59,8 @@ public class AppUserService {
     }
 
     public void updateAppUser(Integer appUserId, AppUserUpdateRequest request) {
-        AppUser appUser = getAppUsersById(appUserId);
+        AppUser appUser = appUserDao.selectAppUsersById(appUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("appUser with id [%s] not found".formatted(appUserId)));
 
         boolean changes = false;
 

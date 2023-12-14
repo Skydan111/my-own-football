@@ -1,7 +1,12 @@
 package com.skydan.user;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -14,7 +19,7 @@ import java.util.Objects;
                 )
         }
 )
-public class AppUser {
+public class AppUser implements UserDetails {
 
     @Id
     @SequenceGenerator(
@@ -43,21 +48,36 @@ public class AppUser {
     )
     @Enumerated(EnumType.STRING)
     private Team team;
+    @Column(
+            nullable = false
+    )
+    private String password;
 
     public AppUser() {
     }
 
-    public AppUser(Integer id, String name, String email, Integer age, Team team) {
+    public AppUser(Integer id,
+                   String name,
+                   String email,
+                   String password,
+                   Integer age,
+                   Team team) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.password = password;
         this.age = age;
         this.team = team;
     }
 
-    public AppUser(String name, String email, Integer age, Team team) {
+    public AppUser(String name,
+                   String email,
+                   String password,
+                   Integer age,
+                   Team team) {
         this.name = name;
         this.email = email;
+        this.password = password;
         this.age = age;
         this.team = team;
     }
@@ -127,5 +147,40 @@ public class AppUser {
                 ", age=" + age +
                 ", team=" + team +
                 '}';
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

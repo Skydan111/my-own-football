@@ -1,5 +1,8 @@
 package com.skydan.user;
 
+import com.skydan.jwt.JWTUtil;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,24 +12,30 @@ import java.util.List;
 public class AppUserController {
 
     private final AppUserService appUserService;
+    private final JWTUtil jwtUtil;
 
-    public AppUserController(AppUserService appUserService) {
+    public AppUserController(AppUserService appUserService, JWTUtil jwtUtil) {
         this.appUserService = appUserService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
-    public List<AppUser> getAppUsers() {
+    public List<AppUserDTO> getAppUsers() {
         return appUserService.getAllAppUsers();
     }
 
     @GetMapping("{appUserId}")
-    public AppUser getAppUser(@PathVariable("appUserId") Integer appUserId) {
+    public AppUserDTO getAppUser(@PathVariable("appUserId") Integer appUserId) {
         return appUserService.getAppUsersById(appUserId);
     }
 
     @PostMapping
-    public void registerAppUser(@RequestBody AppUserRegistrationRequest request) {
+    public ResponseEntity<?> registerAppUser(@RequestBody AppUserRegistrationRequest request) {
         appUserService.addAppUser(request);
+        String jwtToken = jwtUtil.issueToken(request.email(), "ROLE_USER");
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, jwtToken)
+                .build();
     }
 
     @DeleteMapping("{appUserId}")

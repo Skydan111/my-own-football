@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({TestConfig.class})
 class AppUserRepositoryTest extends AbstractTestcontainers {
 
     @Autowired
@@ -29,7 +29,7 @@ class AppUserRepositoryTest extends AbstractTestcontainers {
     void existsAppUserByEmail() {
         // Given
         String email = "email" + UUID.randomUUID() + "@gmail.com";
-        AppUser appUser = new AppUser("Alex", email, 20, Team.SHAKHTAR);
+        AppUser appUser = new AppUser("Alex", email, "password", 20, Team.SHAKHTAR);
 
         underTest.save(appUser);
 
@@ -56,7 +56,7 @@ class AppUserRepositoryTest extends AbstractTestcontainers {
     void existsAppUserById() {
         // Given
         String email = "email" + UUID.randomUUID() + "@gmail.com";
-        AppUser appUser = new AppUser("Alex", email, 20, Team.SHAKHTAR);
+        AppUser appUser = new AppUser("Alex", email, "password", 20, Team.SHAKHTAR);
 
         underTest.save(appUser);
 

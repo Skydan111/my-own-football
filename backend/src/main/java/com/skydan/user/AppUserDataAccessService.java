@@ -48,4 +48,9 @@ public class AppUserDataAccessService implements AppUserDao{
     public void updateAppUser(AppUser update) {
         appUserRepository.save(update);
     }
+
+    @Override
+    public Optional<AppUser> selectAppUserByEmail(String email) {
+        return appUserRepository.findAppUserByEmail(email);
+    }
 }
