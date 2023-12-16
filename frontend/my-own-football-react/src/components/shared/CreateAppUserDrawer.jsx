@@ -13,9 +13,10 @@ import CreateAppUserForm from "./CreateAppUserForm.jsx";
 
 const CloseIcon = () => "x";
 
+// eslint-disable-next-line react/prop-types
 const CreateAppUserDrawer = ({ fetchAppUsers }) => {
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen, onClose } = useDisclosure()
 
     return <>
         <Drawer isOpen={isOpen} onClose={onClose}>
@@ -26,7 +27,7 @@ const CreateAppUserDrawer = ({ fetchAppUsers }) => {
 
                 <DrawerBody>
                     <CreateAppUserForm
-                        fetchAppUsers={fetchAppUsers}
+                        onSuccess={fetchAppUsers}
                     />
                 </DrawerBody>
 

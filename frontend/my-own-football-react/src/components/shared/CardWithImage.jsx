@@ -18,10 +18,10 @@ import {
     AlertDialogFooter,
     useDisclosure,
 } from '@chakra-ui/react';
-import {deleteAppUser} from "../services/client.js";
-import {errorNotification, successNotification} from "../services/notification.js";
+import {deleteAppUser} from "../../services/client.js";
+import {errorNotification, successNotification} from "../../services/notification.js";
 import {useRef} from "react";
-import UpdateAppUserDrawer from "./shared/UpdateAppUserDrawer.jsx";
+import UpdateAppUserDrawer from "./UpdateAppUserDrawer.jsx";
 
 export default function CardWithImage({id, name, email, age, fetchAppUsers}) {
 

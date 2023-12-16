@@ -9,7 +9,6 @@ import {
     HStack,
     Icon,
     IconButton,
-    Link,
     Menu,
     MenuButton,
     MenuDivider,
@@ -32,6 +31,8 @@ import {
     FiStar,
     FiTrendingUp
 } from 'react-icons/fi';
+
+import {useAuth} from "../context/AuthContext.jsx";
 
 const LinkItems = [
     {name: 'Home', icon: FiHome},
@@ -81,13 +82,15 @@ const SidebarContent = ({onClose, ...rest}) => {
             pos="fixed"
             h="full"
             {...rest}>
-            <Flex h="20" flexDirection="column" alignItems="center" mx="8" mb={70} mt={1} justifyContent="space-between">
+            <Flex h="20" flexDirection="column" alignItems="center" mx="8" mb={100} mt={1} justifyContent="space-between">
                 <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" mb={3}>
                     Fantasy UPL
                 </Text>
                 <Image
                     boxSize='80px'
                     src='https://user-images.githubusercontent.com/119408158/282424639-9d753b02-be1f-4818-9b68-54e6bba2e690.png'
+                    width={"80px"}
+                    height={"105px"}
                     alt='UPL'
                 />
                 <CloseButton display={{base: 'flex', md: 'none'}} onClick={onClose}/>
@@ -133,6 +136,9 @@ const NavItem = ({icon, children, ...rest}) => {
 };
 
 const MobileNav = ({onOpen, ...rest}) => {
+
+    const { logOut, appUser } = useAuth();
+
     return (
         <Flex
             ml={{base: 0, md: 60}}
@@ -185,10 +191,10 @@ const MobileNav = ({onOpen, ...rest}) => {
                                     alignItems="flex-start"
                                     spacing="1px"
                                     ml="2">
-                                    <Text fontSize="sm">Justina Clark</Text>
-                                    <Text fontSize="xs" color="gray.600">
-                                        Admin
-                                    </Text>
+                                    <Text fontSize="sm">{appUser?.username}</Text>
+                                    {/*<Text fontSize="xs" color="gray.600">*/}
+                                    {/*    olegskidan@gmail.com*/}
+                                    {/*</Text>*/}
                                 </VStack>
                                 <Box display={{base: 'none', md: 'flex'}}>
                                     <FiChevronDown/>
@@ -200,9 +206,12 @@ const MobileNav = ({onOpen, ...rest}) => {
                             borderColor={useColorModeValue('gray.200', 'gray.700')}>
                             <MenuItem>Profile</MenuItem>
                             <MenuItem>Settings</MenuItem>
-                            <MenuItem>Billing</MenuItem>
                             <MenuDivider/>
-                            <MenuItem>Sign out</MenuItem>
+                            <MenuItem
+                                onClick={logOut}
+                            >
+                                Sign out
+                            </MenuItem>
                         </MenuList>
                     </Menu>
                 </Flex>

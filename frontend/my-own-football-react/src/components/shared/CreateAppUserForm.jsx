@@ -49,13 +49,14 @@ const MySelect = ({ label, ...props }) => {
     );
 };
 
-const CreateAppUserForm = ({ fetchAppUsers }) => {
+const CreateAppUserForm = ({ onSuccess }) => {
     return (
         <>
             <Formik
                 initialValues={{
                     name: '',
                     email: '',
+                    password: '',
                     age: 0,
                     team: '',
                 }}
@@ -65,6 +66,9 @@ const CreateAppUserForm = ({ fetchAppUsers }) => {
                         .required('Required'),
                     email: Yup.string()
                         .email('Invalid email address')
+                        .required('Required'),
+                    password: Yup.string()
+                        .min(8, 'Must be 8 characters or more')
                         .required('Required'),
                     age: Yup.number()
                         .min(7, 'Must be at least 7 years of age')
@@ -90,7 +94,7 @@ const CreateAppUserForm = ({ fetchAppUsers }) => {
                                 "User was created",
                                 `${appUser.name} was successfully created`
                             )
-                            fetchAppUsers();
+                            onSuccess(res.headers["authorization"]);
                         }).catch(err => {
                             errorNotification(
                                 "What are you doing?",
@@ -116,6 +120,12 @@ const CreateAppUserForm = ({ fetchAppUsers }) => {
                                 name="email"
                                 type="email"
                                 placeholder="uaf@mail.com"
+                            />
+
+                            <MyTextInput
+                                label="Password"
+                                name="password"
+                                type="password"
                             />
 
                             <MyTextInput
