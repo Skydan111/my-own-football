@@ -1,10 +1,12 @@
 package com.skydan.user;
 
+import com.skydan.player.Player;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -42,16 +44,28 @@ public class AppUser implements UserDetails {
     @Column(
             nullable = false
     )
-    private Integer age;
-    @Column(
-            nullable = false
-    )
     @Enumerated(EnumType.STRING)
     private Team team;
     @Column(
             nullable = false
     )
     private String password;
+
+    @ManyToMany(
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
+    @JoinTable(
+            name = "transfers",
+            joinColumns = @JoinColumn(
+                    name = "app_user_id",
+                    foreignKey = @ForeignKey(name = "transfers_app_user_id_fk")
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "player_id",
+                    foreignKey = @ForeignKey(name = "transfers_player_id_fk")
+            )
+    )
+    private List<Player> players = new ArrayList<>();
 
     public AppUser() {
     }
@@ -60,25 +74,21 @@ public class AppUser implements UserDetails {
                    String name,
                    String email,
                    String password,
-                   Integer age,
                    Team team) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.age = age;
         this.team = team;
     }
 
     public AppUser(String name,
                    String email,
                    String password,
-                   Integer age,
                    Team team) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.age = age;
         this.team = team;
     }
 
@@ -106,20 +116,28 @@ public class AppUser implements UserDetails {
         this.email = email;
     }
 
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
     public Team getTeam() {
         return team;
     }
 
     public void setTeam(Team team) {
         this.team = team;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void addPlayer(Player player) {
+        if (!players.contains(player)) {
+            players.add(player);
+            player.getUsers().add(this);
+        }
+    }
+
+    public void removePlayer(Player player) {
+        players.remove(player);
+        player.getUsers().remove(this);
     }
 
     @Override
@@ -130,12 +148,12 @@ public class AppUser implements UserDetails {
         return Objects.equals(id, appUser.id) &&
                 Objects.equals(name, appUser.name) &&
                 Objects.equals(email, appUser.email) &&
-                Objects.equals(age, appUser.age) && team == appUser.team;
+                team == appUser.team;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, age, team);
+        return Objects.hash(id, name, email, team);
     }
 
     @Override
@@ -144,7 +162,6 @@ public class AppUser implements UserDetails {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", age=" + age +
                 ", team=" + team +
                 '}';
     }

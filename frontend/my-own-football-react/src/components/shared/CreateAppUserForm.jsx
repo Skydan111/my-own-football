@@ -16,6 +16,8 @@ import {
 import { saveAppUser } from "../../services/client.js";
 import { successNotification, errorNotification } from "../../services/notification.js";
 
+
+// eslint-disable-next-line react/prop-types
 const MyTextInput = ({ label, ...props }) => {
 
     const [field, meta] = useField(props);
@@ -33,12 +35,14 @@ const MyTextInput = ({ label, ...props }) => {
     );
 };
 
+// eslint-disable-next-line react/prop-types
 const MySelect = ({ label, ...props }) => {
     const [field, meta] = useField(props);
+
     return (
         <Box>
             <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
-            <Select {...field} {...props} />
+            <Select {...field} {...props} size='lg'/>
             {meta.touched && meta.error ? (
                 <Alert className="error" status={"error"} mt={2}>
                     <AlertIcon />
@@ -69,10 +73,6 @@ const CreateAppUserForm = ({ onSuccess }) => {
                         .required('Required'),
                     password: Yup.string()
                         .min(8, 'Must be 8 characters or more')
-                        .required('Required'),
-                    age: Yup.number()
-                        .min(7, 'Must be at least 7 years of age')
-                        .max(100, 'Must be less than 100 years of age')
                         .required('Required'),
                     team: Yup.string()
                         .oneOf(
@@ -126,13 +126,6 @@ const CreateAppUserForm = ({ onSuccess }) => {
                                 label="Password"
                                 name="password"
                                 type="password"
-                            />
-
-                            <MyTextInput
-                                label="Age"
-                                name="age"
-                                type="number"
-                                placeholder="48"
                             />
 
                             <MySelect label="Team" name="team">

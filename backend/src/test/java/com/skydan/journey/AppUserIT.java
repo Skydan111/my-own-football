@@ -29,8 +29,7 @@ public class AppUserIT {
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, "password", 18,
-                Team.SHAKHTAR);
+                name, email, "password", Team.SHAKHTAR);
 
         String jwtToken = webTestClient.post()
                 .uri(USER_PATH)
@@ -64,7 +63,7 @@ public class AppUserIT {
                 .orElseThrow();
 
         AppUserDTO expected =
-                new AppUserDTO(id, name, email, 18, Team.SHAKHTAR, List.of("ROLE_USER"), email);
+                new AppUserDTO(id, name, email, Team.SHAKHTAR, List.of("ROLE_USER"), email);
 
         assertThat(appUsers).contains(expected);
 
@@ -87,10 +86,10 @@ public class AppUserIT {
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
 
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, "password", 18, Team.SHAKHTAR);
+                name, email, "password", Team.SHAKHTAR);
 
         AppUserRegistrationRequest request2 = new AppUserRegistrationRequest(
-                name, email + ".ua", "password", 18, Team.SHAKHTAR);
+                name, email + ".ua", "password", Team.SHAKHTAR);
 
         // Send post request to create user 1
         webTestClient.post()
@@ -160,8 +159,7 @@ public class AppUserIT {
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                name, email, "password", 18,
-                Team.SHAKHTAR);
+                name, email, "password", Team.SHAKHTAR);
 
         String jwtToken = webTestClient.post()
                 .uri(USER_PATH)
@@ -196,8 +194,7 @@ public class AppUserIT {
 
         String newName = "Bar";
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                newName, null, null, null
-        );
+                newName, null, null);
 
         webTestClient.put()
                 .uri(USER_PATH + "/{id}", id)
@@ -221,7 +218,7 @@ public class AppUserIT {
                 .getResponseBody();
 
         AppUserDTO expected = new AppUserDTO(
-                id, newName, email, 18, Team.SHAKHTAR, List.of("ROLE_USER"), email
+                id, newName, email, Team.SHAKHTAR, List.of("ROLE_USER"), email
         );
 
         assertThat(updatedAppUser).isEqualTo(expected);

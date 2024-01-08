@@ -45,7 +45,6 @@ public class AppUserService {
                 appUserRegistrationRequest.name(),
                 appUserRegistrationRequest.email(),
                 passwordEncoder.encode(appUserRegistrationRequest.password()),
-                appUserRegistrationRequest.age(),
                 appUserRegistrationRequest.team()
         );
         appUserDao.insertAppUser(appUser);
@@ -68,6 +67,7 @@ public class AppUserService {
             appUser.setName(request.name());
             changes = true;
         }
+
         if (request.email() != null && !request.email().equals(appUser.getEmail())) {
             if (appUserDao.existsUserWithEmail(request.email())) {
                 throw new DuplicateResourceException("email already taken");
@@ -75,14 +75,12 @@ public class AppUserService {
             appUser.setEmail(request.email());
             changes = true;
         }
-        if (request.age() != null && !request.age().equals(appUser.getAge())) {
-            appUser.setAge(request.age());
-            changes = true;
-        }
+
         if (request.team() != null && !request.team().equals(appUser.getTeam())) {
             appUser.setTeam(request.team());
             changes = true;
         }
+
         if (!changes) throw new RequestValidationException("no data changes found");
 
         appUserDao.updateAppUser(appUser);

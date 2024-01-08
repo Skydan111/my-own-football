@@ -42,11 +42,10 @@ public class AuthenticationIT {
         String name = "Foo";
         String email = name.toLowerCase() + UUID.randomUUID() + "@email.com";
         String password = "password";
-        int age = 18;
         Team team = Team.SHAKHTAR;
 
         AppUserRegistrationRequest appUserRegistrationRequest = new AppUserRegistrationRequest(
-                name, email, password, age, team);
+                name, email, password, team);
 
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(email, password);
 
@@ -89,7 +88,6 @@ public class AuthenticationIT {
 
         assertThat(jwtUtil.isTokenValid(jwtToken, appUserDTO.username())).isTrue();
         assertThat(appUserDTO.email()).isEqualTo(email);
-        assertThat(appUserDTO.age()).isEqualTo(age);
         assertThat(appUserDTO.name()).isEqualTo(name);
         assertThat(appUserDTO.team()).isEqualTo(team);
         assertThat(appUserDTO.username()).isEqualTo(email);

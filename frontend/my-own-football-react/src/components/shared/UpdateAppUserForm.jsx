@@ -11,11 +11,12 @@ import {
     Button,
     FormLabel,
     Input,
-    Select, Stack
+    Stack
 } from "@chakra-ui/react";
-import {saveAppUser, updateAppUser} from "../../services/client.js";
+import {updateAppUser} from "../../services/client.js";
 import {successNotification, errorNotification} from "../../services/notification.js";
 
+// eslint-disable-next-line react/prop-types
 const MyTextInput = ({label, ...props}) => {
 
     const [field, meta] = useField(props);
@@ -33,6 +34,7 @@ const MyTextInput = ({label, ...props}) => {
     );
 };
 
+// eslint-disable-next-line react/prop-types
 const UpdateAppUserForm = ({ fetchAppUsers, initialValues, appUserId }) => {
     return (
         <>
@@ -44,16 +46,12 @@ const UpdateAppUserForm = ({ fetchAppUsers, initialValues, appUserId }) => {
                         .required('Required'),
                     email: Yup.string()
                         .email('Invalid email address')
-                        .required('Required'),
-                    age: Yup.number()
-                        .min(7, 'Must be at least 7 years of age')
-                        .max(100, 'Must be less than 100 years of age')
-                        .required('Required'),
+                        .required('Required')
                 })}
                 onSubmit={(updatedAppUser, {setSubmitting}) => {
                     setSubmitting(true);
                     updateAppUser(appUserId, updatedAppUser)
-                        .then(res => {
+                        .then(() => {
                             successNotification(
                                 "User was updated",
                                 `${updatedAppUser.name} was successfully updated`
@@ -84,13 +82,6 @@ const UpdateAppUserForm = ({ fetchAppUsers, initialValues, appUserId }) => {
                                 name="email"
                                 type="email"
                                 placeholder="uaf@mail.com"
-                            />
-
-                            <MyTextInput
-                                label="Age"
-                                name="age"
-                                type="number"
-                                placeholder="48"
                             />
 
                             <Button disabled={!(isValid && dirty) || !isSubmitting} type="submit">Submit</Button>

@@ -47,7 +47,7 @@ class AppUserServiceTest {
     void canGetAppUsersById() {
         //Given
         int id = 1;
-        AppUser appUser = new AppUser(id,"Foo", "foo@email.com", "password", 18, SHAKHTAR);
+        AppUser appUser = new AppUser(id,"Foo", "foo@email.com", "password", SHAKHTAR);
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         AppUserDTO expected = appUserDTOMapper.apply(appUser);
@@ -78,7 +78,7 @@ class AppUserServiceTest {
         String email = "foo@email.com";
         when(appUserDao.existsUserWithEmail(email)).thenReturn(false);
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                "Foo", email, "password", 18, SHAKHTAR);
+                "Foo", email, "password", SHAKHTAR);
 
         String passwordHash = "$%^%^UGvsdjnvGFNJM%^&R$";
 
@@ -95,7 +95,6 @@ class AppUserServiceTest {
         assertThat(capturedAppUser.getId()).isNull();
         assertThat(capturedAppUser.getName()).isEqualTo(request.name());
         assertThat(capturedAppUser.getEmail()).isEqualTo(request.email());
-        assertThat(capturedAppUser.getAge()).isEqualTo(request.age());
         assertThat(capturedAppUser.getPassword()).isEqualTo(passwordHash);
     }
 
@@ -105,8 +104,7 @@ class AppUserServiceTest {
         String email = "foo@email.com";
         when(appUserDao.existsUserWithEmail(email)).thenReturn(true);
         AppUserRegistrationRequest request = new AppUserRegistrationRequest(
-                "Foo", email, "password", 18,
-                SHAKHTAR);
+                "Foo", email, "password", SHAKHTAR);
 
         //When
         assertThatThrownBy(() -> underTest.addAppUser(request))
@@ -150,14 +148,14 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@gmail.com", "password", 19, SHAKHTAR
+                id, "Foo", "foo@gmail.com", "password", SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         String newEmail = "bar@email.com";
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                "Bar", newEmail, 23, DYNAMO);
+                "Bar", newEmail, DYNAMO);
 
         when(appUserDao.existsUserWithEmail(newEmail)).thenReturn(false);
 
@@ -173,7 +171,6 @@ class AppUserServiceTest {
 
         assertThat(capturedAppUser.getName()).isEqualTo(updateRequest.name());
         assertThat(capturedAppUser.getEmail()).isEqualTo(updateRequest.email());
-        assertThat(capturedAppUser.getAge()).isEqualTo(updateRequest.age());
         assertThat(capturedAppUser.getTeam()).isEqualTo(updateRequest.team());
     }
 
@@ -182,12 +179,12 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                "Bar", null, null, null);
+                "Bar", null, null);
 
         // When
         underTest.updateAppUser(id, updateRequest);
@@ -200,7 +197,6 @@ class AppUserServiceTest {
         AppUser capturedAppUser = appUserArgumentCaptor.getValue();
 
         assertThat(capturedAppUser.getName()).isEqualTo(updateRequest.name());
-        assertThat(capturedAppUser.getAge()).isEqualTo(appUser.getAge());
         assertThat(capturedAppUser.getEmail()).isEqualTo(appUser.getEmail());
         assertThat(capturedAppUser.getTeam()).isEqualTo(appUser.getTeam());
     }
@@ -210,14 +206,14 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         String newEmail = "bar@email.com";
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                null, newEmail, null, null);
+                null, newEmail, null);
 
         when(appUserDao.existsUserWithEmail(newEmail)).thenReturn(false);
 
@@ -232,36 +228,7 @@ class AppUserServiceTest {
         AppUser capturedAppUser = appUserArgumentCaptor.getValue();
 
         assertThat(capturedAppUser.getName()).isEqualTo(appUser.getName());
-        assertThat(capturedAppUser.getAge()).isEqualTo(appUser.getAge());
         assertThat(capturedAppUser.getEmail()).isEqualTo(newEmail);
-        assertThat(capturedAppUser.getTeam()).isEqualTo(appUser.getTeam());
-    }
-
-    @Test
-    void canUpdateOnlyAppUserAge() {
-        // Given
-        int id = 1;
-        AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
-        );
-        when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
-
-        AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                null, null, 22, null);
-
-        // When
-        underTest.updateAppUser(id, updateRequest);
-
-        // Then
-        ArgumentCaptor<AppUser> appUserArgumentCaptor =
-                ArgumentCaptor.forClass(AppUser.class);
-
-        verify(appUserDao).updateAppUser(appUserArgumentCaptor.capture());
-        AppUser capturedAppUser = appUserArgumentCaptor.getValue();
-
-        assertThat(capturedAppUser.getName()).isEqualTo(appUser.getName());
-        assertThat(capturedAppUser.getAge()).isEqualTo(updateRequest.age());
-        assertThat(capturedAppUser.getEmail()).isEqualTo(appUser.getEmail());
         assertThat(capturedAppUser.getTeam()).isEqualTo(appUser.getTeam());
     }
 
@@ -270,12 +237,12 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                null, null, null, DYNAMO);
+                null, null, DYNAMO);
 
         // When
         underTest.updateAppUser(id, updateRequest);
@@ -288,7 +255,6 @@ class AppUserServiceTest {
         AppUser capturedAppUser = appUserArgumentCaptor.getValue();
 
         assertThat(capturedAppUser.getName()).isEqualTo(appUser.getName());
-        assertThat(capturedAppUser.getAge()).isEqualTo(appUser.getAge());
         assertThat(capturedAppUser.getEmail()).isEqualTo(appUser.getEmail());
         assertThat(capturedAppUser.getTeam()).isEqualTo(updateRequest.team());
     }
@@ -298,14 +264,14 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         String newEmail = "bar@email.com";
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                null, newEmail, null, null);
+                null, newEmail, null);
 
         when(appUserDao.existsUserWithEmail(newEmail)).thenReturn(true);
 
@@ -323,12 +289,12 @@ class AppUserServiceTest {
         // Given
         int id = 1;
         AppUser appUser = new AppUser(
-                id, "Foo", "foo@email.com", "password", 19, SHAKHTAR
+                id, "Foo", "foo@email.com", "password", SHAKHTAR
         );
         when(appUserDao.selectAppUsersById(id)).thenReturn(Optional.of(appUser));
 
         AppUserUpdateRequest updateRequest = new AppUserUpdateRequest(
-                appUser.getName(), appUser.getEmail(), appUser.getAge(), appUser.getTeam());
+                appUser.getName(), appUser.getEmail(), appUser.getTeam());
 
         // When
         assertThatThrownBy(() -> underTest.updateAppUser(id, updateRequest))

@@ -29,7 +29,7 @@ class AppUserRepositoryTest extends AbstractTestcontainers {
     void existsAppUserByEmail() {
         // Given
         String email = "email" + UUID.randomUUID() + "@gmail.com";
-        AppUser appUser = new AppUser("Alex", email, "password", 20, Team.SHAKHTAR);
+        AppUser appUser = new AppUser("Alex", email, "password", Team.SHAKHTAR);
 
         underTest.save(appUser);
 
@@ -56,7 +56,7 @@ class AppUserRepositoryTest extends AbstractTestcontainers {
     void existsAppUserById() {
         // Given
         String email = "email" + UUID.randomUUID() + "@gmail.com";
-        AppUser appUser = new AppUser("Alex", email, "password", 20, Team.SHAKHTAR);
+        AppUser appUser = new AppUser("Alex", email, "password", Team.SHAKHTAR);
 
         underTest.save(appUser);
 

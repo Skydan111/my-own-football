@@ -23,7 +23,44 @@ import {errorNotification, successNotification} from "../../services/notificatio
 import {useRef} from "react";
 import UpdateAppUserDrawer from "./UpdateAppUserDrawer.jsx";
 
-export default function CardWithImage({id, name, email, age, fetchAppUsers}) {
+const getAvatarsSrc = team => {
+    if (team === 'DYNAMO') {
+        return '/src/images/logo/dynamo_logo.svg.png';
+    } else if (team === 'SHAKHTAR') {
+        return '/src/images/logo/schakhtar_logo.svg.png';
+    } else if (team === 'ZORIA') {
+        return '/src/images/logo/zorya_logo.svg.png';
+    } else if (team === 'KOLOS') {
+        return '/src/images/logo/kolos_logo.svg.png';
+    } else if (team === 'OLEKSANDRIA') {
+        return '/src/images/logo/oleksandriya_logo.svg.png';
+    } else if (team === 'DNIPRO_1') {
+        return '/src/images/logo/dnipro_logo.png';
+    } else if (team === 'CHORNOMORETS') {
+        return '/src/images/logo/chornomorets_logo.jpeg';
+    } else if (team === 'RUKH') {
+        return '/src/images/logo/rukh_logo_2019.png';
+    } else if (team === 'OBOLON') {
+        return '/src/images/logo/obolon_logo.png';
+    } else if (team === 'VORSKLA') {
+        return '/src/images/logo/vorskla_logo.svg.png';
+    } else if (team === 'LNZ') {
+        return '/src/images/logo/lnz_logo.png';
+    } else if (team === 'VERES') {
+        return '/src/images/logo/veres_logo.png';
+    } else if (team === 'METALIST1925') {
+        return '/src/images/logo/metalist_1925_logo.png';
+    } else if (team === 'MINAJ') {
+        return '/src/images/logo/mynai_logo.png';
+    } else if (team === 'KRYVBAS') {
+        return '/src/images/logo/kryvbas_logo.svg.png';
+    } else if (team === 'POLISSIA') {
+        return '/src/images/logo/polissya_logo.png';
+    }
+}
+
+// eslint-disable-next-line react/prop-types
+export default function CardWithImage({id, name, email, team,  fetchAppUsers}) {
 
     const {isOpen, onOpen, onClose} = useDisclosure()
     const cancelRef = useRef()
@@ -51,11 +88,8 @@ export default function CardWithImage({id, name, email, age, fetchAppUsers}) {
                 <Flex justify={'center'} mt={-12}>
                     <Avatar
                         size={'xl'}
-                        // src={
-                        //     'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
-                        // }
                         name={name}
-                        src='https://bit.ly/broken-link'
+                        src={getAvatarsSrc(team)}
                         alt={'Author'}
                         css={{
                             border: '2px solid white',
@@ -70,13 +104,12 @@ export default function CardWithImage({id, name, email, age, fetchAppUsers}) {
                             {name}
                         </Heading>
                         <Text color={'gray.500'}>{email}</Text>
-                        <Text color={'gray.500'}>Age {age}</Text>
                     </Stack>
                 </Box>
                 <Stack direction={'row'} justify={'center'} spacing={6} p={4}>
                     <Stack>
                         <UpdateAppUserDrawer
-                            initialValues={{name, email, age}}
+                            initialValues={{name, email}}
                             appUserId={id}
                             fetchAppUsers={fetchAppUsers}
                         />
@@ -117,7 +150,7 @@ export default function CardWithImage({id, name, email, age, fetchAppUsers}) {
                                             Cancel
                                         </Button>
                                         <Button colorScheme='red' onClick={() => {
-                                            deleteAppUser(id).then(res => {
+                                            deleteAppUser(id).then(() => {
                                                 successNotification(
                                                     'User deleted',
                                                     `${name} was successfully deleted`
