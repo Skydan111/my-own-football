@@ -35,8 +35,16 @@ public class Player {
     @Enumerated(EnumType.STRING)
     private Team team;
 
-    @OneToOne(mappedBy = "player")
-    private PlayerStatistics playerStatistics;
+    @Transient
+    private int totalPoints;
+
+
+    @OneToMany(
+            mappedBy = "player",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private List<PlayerStatistics> statsList = new ArrayList<>();
 
     @ManyToMany(mappedBy = "players")
     private List<AppUser> users = new ArrayList<>();
@@ -48,7 +56,18 @@ public class Player {
         this.name = name;
         this.position = position;
         this.team = team;
-        this.playerStatistics = createStatistics();
+        this.totalPoints = 0;
+        PlayerStatistics statistics = createStatistics();
+        addStatistics(statistics);
+    }
+
+    public Player(String name, Position position, Team team, PlayerStatistics playerStatistics) {
+        this.name = name;
+        this.position = position;
+        this.team = team;
+        this.totalPoints = 0;
+        PlayerStatistics statistics = playerStatistics != null ? playerStatistics : createStatistics();
+        addStatistics(statistics);
     }
 
     public Integer getId() {
@@ -83,36 +102,67 @@ public class Player {
         this.team = team;
     }
 
+    public int getTotalPoints(PlayerService playerService) {
+        calculateTotalPoints(playerService);
+        return totalPoints;
+    }
+
+    public void setTotalPoints(int totalPoints) {
+        this.totalPoints = totalPoints;
+    }
+
     public List<AppUser> getUsers() {
         return users;
     }
 
-    public PlayerStatistics getPlayerStatistics() {
-        return playerStatistics;
+    public void addStatistics(PlayerStatistics statistics) {
+        statistics.setPlayer(this);
+        statsList.add(statistics);
     }
 
-    public void setPlayerStatistics(PlayerStatistics playerStatistics) {
-        this.playerStatistics = playerStatistics;
+    public void removeStatistics(PlayerStatistics statistics) {
+        if (statistics != null && statsList.contains(statistics)) {
+            statistics.setPlayer(null);
+            statsList.remove(statistics);
+        }
+    }
+
+    public List<PlayerStatistics> getStatsList() {
+        return statsList;
+    }
+
+    public void setStatsList(List<PlayerStatistics> statsList) {
+        this.statsList = statsList;
+    }
+
+    public void calculateTotalPoints(PlayerService playerService) {
+        totalPoints = playerService.calculateTotalPoints(this);
+    }
+
+    public int calculatePointsForCurrentTour(PlayerService playerService, int currentTour) {
+        return playerService.calculatePointsForCurrentTour(this, currentTour);
     }
 
     private PlayerStatistics createStatistics() {
-        return switch (position) {
+        PlayerStatistics statistics = switch (position) {
             case GOALKEEPER -> new GoalkeeperStatistics();
             case DEFENDER -> new DefenderStatistics();
             case MIDFIELDER -> new MidfielderStatistics();
             case FORWARD -> new ForwardStatistics();
             default -> throw new IllegalArgumentException("Invalid position");
         };
+
+        addStatistics(statistics);
+        return statistics;
     }
 
     @Override
     public String toString() {
         return "Player{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", position=" + position +
                 ", team=" + team +
-                ", playerStatistics=" + playerStatistics +
+                ", totalPoints=" + totalPoints +
                 '}';
     }
 }

@@ -3,6 +3,8 @@ package com.skydan.user;
 import com.skydan.exception.DuplicateResourceException;
 import com.skydan.exception.RequestValidationException;
 import com.skydan.exception.ResourceNotFoundException;
+import com.skydan.player.PlayerDTO;
+import com.skydan.player.PlayerDTOMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +17,17 @@ public class AppUserService {
     private final AppUserDao appUserDao;
     private final AppUserDTOMapper appUserDTOMapper;
     private final PasswordEncoder passwordEncoder;
+    private final PlayerDTOMapper playerDTOMapper;
 
 
-    public AppUserService(AppUserDao appUserDao, AppUserDTOMapper appUserDTOMapper, PasswordEncoder passwordEncoder) {
+    public AppUserService(AppUserDao appUserDao,
+                          AppUserDTOMapper appUserDTOMapper,
+                          PasswordEncoder passwordEncoder,
+                          PlayerDTOMapper playerDTOMapper) {
         this.appUserDao = appUserDao;
         this.appUserDTOMapper = appUserDTOMapper;
         this.passwordEncoder = passwordEncoder;
+        this.playerDTOMapper = playerDTOMapper;
     }
 
     public List<AppUserDTO> getAllAppUsers() {
@@ -84,5 +91,15 @@ public class AppUserService {
         if (!changes) throw new RequestValidationException("no data changes found");
 
         appUserDao.updateAppUser(appUser);
+    }
+
+    public List<PlayerDTO> getAllUserPlayers(Integer appUserId) {
+        AppUser appUser = appUserDao.selectAppUsersById(appUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("appUser with id [%s] not found".formatted(appUserId)));
+
+        return appUser.getPlayers()
+                .stream()
+                .map(playerDTOMapper)
+                .collect(Collectors.toList());
     }
 }

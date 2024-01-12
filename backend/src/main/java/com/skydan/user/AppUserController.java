@@ -1,6 +1,7 @@
 package com.skydan.user;
 
 import com.skydan.jwt.JWTUtil;
+import com.skydan.player.PlayerDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,5 +48,10 @@ public class AppUserController {
     public void updateAppUser(@PathVariable("appUserId") Integer appUserId,
                               @RequestBody AppUserUpdateRequest request) {
         appUserService.updateAppUser(appUserId, request);
+    }
+
+    @GetMapping("/{appUserId}/players")
+    public List<PlayerDTO> getAllAppUserPlayers(@PathVariable("appUserId") Integer appUserId) {
+        return appUserService.getAllUserPlayers(appUserId);
     }
 }

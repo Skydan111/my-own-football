@@ -1,5 +1,6 @@
 package com.skydan.playerStatistics;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -7,22 +8,26 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("FORWARD")
 public class ForwardStatistics extends PlayerStatistics {
 
-    private Integer goals;
+    @Column(
+            nullable = false,
+            columnDefinition = "integer default 0"
+    )
+    private Integer assists;
 
     public ForwardStatistics() {
         super();
     }
 
-    public ForwardStatistics(int totalGames, int wins, int goals) {
-        super(totalGames, wins);
-        this.goals = goals;
+    public ForwardStatistics(int currentTour, int wins, int goals, int assists) {
+        super(currentTour, wins, goals);
+        this.assists = assists;
     }
 
-    public Integer getGoals() {
-        return goals;
+    public Integer getAssists() {
+        return assists;
     }
 
-    public void setGoals(Integer goals) {
-        this.goals = goals;
+    public void setAssists(Integer assists) {
+        this.assists = assists;
     }
 }

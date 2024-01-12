@@ -19,17 +19,22 @@ public class PlayerStatistics {
     )
     private Integer id;
 
-    @Column(
-            nullable = false
-    )
-    private Integer totalGames;
+    @Column(nullable = false)
+    private Integer currentTour;
 
     @Column(
-            nullable = false
+            nullable = false,
+            columnDefinition = "integer default 0"
     )
     private Integer wins;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @Column(
+            nullable = false,
+            columnDefinition = "integer default 0"
+    )
+    private Integer goals;
+
+    @ManyToOne
     @JoinColumn(
             name = "player_id",
             referencedColumnName = "id",
@@ -40,9 +45,10 @@ public class PlayerStatistics {
     public PlayerStatistics() {
     }
 
-    public PlayerStatistics(Integer totalGames, Integer wins) {
-        this.totalGames = totalGames;
+    public PlayerStatistics(Integer currentTour, Integer wins, Integer goals) {
+        this.currentTour = currentTour;
         this.wins = wins;
+        this.goals = goals;
     }
 
     public Integer getId() {
@@ -53,12 +59,12 @@ public class PlayerStatistics {
         this.id = id;
     }
 
-    public Integer getTotalGames() {
-        return totalGames;
+    public int getCurrentTour() {
+        return currentTour;
     }
 
-    public void setTotalGames(Integer totalGames) {
-        this.totalGames = totalGames;
+    public void setCurrentTour(int currentTour) {
+        this.currentTour = currentTour;
     }
 
     public Integer getWins() {
@@ -67,6 +73,14 @@ public class PlayerStatistics {
 
     public void setWins(Integer wins) {
         this.wins = wins;
+    }
+
+    public Integer getGoals() {
+        return goals;
+    }
+
+    public void setGoals(Integer goals) {
+        this.goals = goals;
     }
 
     public Player getPlayer() {

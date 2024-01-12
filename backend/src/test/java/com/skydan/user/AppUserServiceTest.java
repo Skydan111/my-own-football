@@ -3,6 +3,7 @@ package com.skydan.user;
 import com.skydan.exception.DuplicateResourceException;
 import com.skydan.exception.RequestValidationException;
 import com.skydan.exception.ResourceNotFoundException;
+import com.skydan.player.PlayerDTOMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,10 +29,11 @@ class AppUserServiceTest {
     private PasswordEncoder passwordEncoder;
     private AppUserService underTest;
     private final AppUserDTOMapper appUserDTOMapper = new AppUserDTOMapper();
+    private final PlayerDTOMapper playerDTOMapper = new PlayerDTOMapper();
 
     @BeforeEach
     void setUp() {
-        underTest = new AppUserService(appUserDao, appUserDTOMapper, passwordEncoder);
+        underTest = new AppUserService(appUserDao, appUserDTOMapper, passwordEncoder, playerDTOMapper);
     }
 
     @Test

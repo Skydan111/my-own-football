@@ -1,5 +1,6 @@
 package com.skydan.playerStatistics;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -7,14 +8,18 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("GOALKEEPER")
 public class GoalkeeperStatistics extends PlayerStatistics {
 
+    @Column(
+            nullable = false,
+            columnDefinition = "integer default 0"
+    )
     private Integer cleanSheets;
 
     public GoalkeeperStatistics() {
         super();
     }
 
-    public GoalkeeperStatistics(int totalGames, int wins, int cleanSheets) {
-        super(totalGames, wins);
+    public GoalkeeperStatistics(int currentTour, int wins, int goals, int cleanSheets) {
+        super(currentTour, wins, goals);
         this.cleanSheets = cleanSheets;
     }
 
